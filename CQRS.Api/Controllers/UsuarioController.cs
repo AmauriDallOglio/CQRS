@@ -1,6 +1,7 @@
 ﻿using CQRS.Aplicacao.DTO;
 using CQRS.Aplicacao.Interface;
 using CQRS.Aplicacao.Query;
+using CQRS.Aplicacao.Util;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CQRS.Api.Controllers
@@ -14,10 +15,7 @@ namespace CQRS.Api.Controllers
         private readonly ICommandDispatcher _commandDispatcher;
         private readonly ILogger<UsuarioController> _logger;
 
-        public UsuarioController(
-            IQueryDispatcher queryDispatcher,
-            ICommandDispatcher commandDispatcher,
-            ILogger<UsuarioController> logger)
+        public UsuarioController(IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher,  ILogger<UsuarioController> logger)
         {
             _queryDispatcher = queryDispatcher;
             _commandDispatcher = commandDispatcher;
@@ -25,31 +23,45 @@ namespace CQRS.Api.Controllers
         }
 
 
-        [LoggerMessage(
-            EventId = 1001,
-            Level = LogLevel.Information,
-            Message = "Buscando usuário com ID {UserId}"
-        )]
-        partial void LogBuscarUsuario(int? userId);
+        [LoggerMessage(EventId = 1001, Level = LogLevel.Information, Message = "Buscando usuário com id {id}")]
+        partial void LogBuscarUsuario(int? id);
 
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> ObterPorId(int? id, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Buscando usuário com ID {UserId}", id);
+            Logger.Info("Iniciando execução...");
+            _logger.LogTrace("Iniciando busca de usuário. Parâmetro id recebido: {id}", id);
+            _logger.LogDebug("Preparando consulta para o id {id} no método {Method}", id, nameof(ObterPorId));
+
+            _logger.LogInformation("Iniciando busca de usuário...");
+            _logger.LogInformation("Buscando usuário com id {id}!", id);
+            LogBuscarUsuario(id);
 
             var query = new ObterPorIdRequest { Id = id };
-            var user = await _queryDispatcher.Dispatch<ObterPorIdRequest, ObterPorIdResponse>(query, cancellationToken);
+            ObterPorIdResponse usuario = await _queryDispatcher.Dispatch<ObterPorIdRequest, ObterPorIdResponse>(query, cancellationToken);
 
-            if (user == null)
+
+            if (usuario == null)
             {
-                _logger.LogWarning("Usuário com ID {UserId} não encontrado", id);
+                _logger.LogWarning("Nenhum usuário encontrado com id {id}", id);
+                _logger.LogError("Erro: Falha ao localizar o usuário no banco de dados para o id {id}", id);
+
+                // Exemplo de uso do Critical (falha grave)
+                if (id > 20) // Simulação de erro crítico
+                {
+                    _logger.LogCritical("Erro crítico: Usuário com id {id} causou falha no sistema", id);
+                }
+                Logger.Error("Processo finalizado!");
                 return NotFound();
             }
 
-            _logger.LogInformation("Usuário com ID {UserId} encontrado", id);
-  
-            return Ok(user);
+
+
+            _logger.LogInformation("Usuário {nome} encontrado!", usuario.Nome);
+            _logger.LogInformation("Processo finalizado com sucesso!");
+            Logger.Success("Processo finalizado com sucesso!");
+            return Ok(usuario);
         }
 
         // Novo endpoint para retornar a lista fixa em memória
