@@ -2,8 +2,11 @@ using CQRS.Api.Configuracao;
 using CQRS.Aplicacao.Command;
 using CQRS.Aplicacao.Interface;
 using CQRS.Aplicacao.Query;
+using DinkToPdf.Contracts;
+using DinkToPdf;
 using Serilog;
-
+using CQRS.Aplicacao.Util;
+ 
 
 namespace CQRS.Api
 {
@@ -37,6 +40,23 @@ namespace CQRS.Api
             // Configura o Serilog
             SerilogConfig.ConfigurarSerilog();
             builder.Host.UseSerilog();
+
+
+            // Registrar o conversor do DinkToPdf
+
+            // Caminho para a pasta onde está o libwkhtmltox.dll
+            var context = new CustomAssemblyLoadContext();
+            context.LoadUnmanagedLibrary(Path.Combine("C:\\Amauri\\GitHub\\CQRS\\CQRS\\CQRS.Aplicacao", "DinkToPdfLib", "libwkhtmltox.dll"));
+
+            // Registrar DinkToPdf
+            builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+
+
+
+
+            builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            builder.Services.AddScoped<GeradorPdfDinkToPdf>();
+
 
             var app = builder.Build();
             if (app.Environment.IsDevelopment())

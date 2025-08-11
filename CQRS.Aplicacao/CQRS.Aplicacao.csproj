@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DinkToPdf" Version="1.0.8" />
+    <PackageReference Include="IronPdf" Version="2025.6.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
@@ -17,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="Configuracao\" />
+    <Folder Include="DinkToPdfLib\" />
   </ItemGroup>
 
 </Project>
