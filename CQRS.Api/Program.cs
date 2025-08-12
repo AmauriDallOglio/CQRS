@@ -45,15 +45,10 @@ namespace CQRS.Api
             // Registrar o conversor do DinkToPdf
 
             // Caminho para a pasta onde está o libwkhtmltox.dll
-            var context = new CustomAssemblyLoadContext();
-            context.LoadUnmanagedLibrary(Path.Combine("C:\\Amauri\\GitHub\\CQRS\\CQRS\\CQRS.Aplicacao", "DinkToPdfLib", "libwkhtmltox.dll"));
+            var context = new CarregarDLL();
+            context.Carregar(Path.Combine("C:\\Amauri\\GitHub\\CQRS\\CQRS\\CQRS.Aplicacao", "DinkToPdfLib", "libwkhtmltox.dll"));
 
             // Registrar DinkToPdf
-            builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-
-
-
-
             builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             builder.Services.AddScoped<GeradorPdfDinkToPdf>();
 

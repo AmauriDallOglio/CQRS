@@ -80,8 +80,8 @@ namespace CQRS.Api.Controllers
         }
 
 
-        [HttpGet("GeradorPdfDinkToPdfUsuarios")]
-        public IActionResult GerarPdfUsuarios()
+        [HttpGet("IronPdfUsuarios")]
+        public IActionResult GerarIronPdfUsuarios()
         {
             var usuarios = UsuarioDto.ObterUsuarios();
 
@@ -99,7 +99,7 @@ namespace CQRS.Api.Controllers
             var pdf = renderer.RenderHtmlAsPdf(html);
 
             // Retornar o PDF para o cliente
-            return File(pdf.BinaryData, "application/pdf", "GeradorPdfDinkToPdfUsuarios.pdf");
+            return File(pdf.BinaryData, "application/pdf", "IronPdfUsuarios.pdf");
         }
 
 
