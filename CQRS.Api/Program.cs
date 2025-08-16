@@ -2,11 +2,10 @@ using CQRS.Api.Configuracao;
 using CQRS.Aplicacao.Command;
 using CQRS.Aplicacao.Interface;
 using CQRS.Aplicacao.Query;
-using DinkToPdf.Contracts;
-using DinkToPdf;
-using Serilog;
 using CQRS.Aplicacao.Util;
- 
+using DinkToPdf;
+using DinkToPdf.Contracts;
+using Serilog;
 
 namespace CQRS.Api
 {
@@ -18,10 +17,17 @@ namespace CQRS.Api
  
  
             // Dispatchers
-            builder.Services.AddScoped<ICommandDispatcher, CommandDispatcher>();
-            builder.Services.AddScoped<IQueryDispatcher, QueryDispatcher>();
+            //builder.Services.AddScoped<ICommandDispatcher, CommandDispatcher>();
+            //builder.Services.AddScoped<IQueryDispatcher, QueryDispatcher>();
 
- 
+            builder.Services.Scan(
+                scan => scan
+                    .FromAssemblyOf<CommandDispatcher>()
+                    .AddClasses()
+                    .AsImplementedInterfaces()
+                    .WithScopedLifetime()
+            );
+
             builder.RegistrarCommandHandlers();
             builder.RegistrarQueryHandlers();
 
